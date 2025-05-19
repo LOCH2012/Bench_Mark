@@ -1,0 +1,12 @@
+[global]
+ioengine=libaio      # Асинхронный I/O (для QD > 1)
+direct=1             # Прямой доступ (O_DIRECT)
+size=1G              # Объем данных (можно увеличить)
+runtime=10           # Длительность теста (сек)
+filename=testfile.bin  # Путь к тестовому файлу
+
+[4k-randwrite]
+bs=4k                # Блок 4K
+rw=randread         # Случайная запись
+iodepth=1            # Глубина очереди (QD=1)
+numjobs=1            # Количество потоков

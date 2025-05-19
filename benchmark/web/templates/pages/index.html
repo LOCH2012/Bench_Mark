@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}СХД Бенчмарк{% endblock %}
+{% block h1 %}СХД Бенчмарк{% endblock %}
+
+{% block subtitle %}Комплекс для оценки производительности подсистем хранения данных{% endblock %}
+{% block header_content %}
+    {{ super() }}
+{% endblock %}
+
+
+{% block content %}
+    <section class="card">
+<!--        <h2>Наши преимущества</h2>-->
+<!--        <p>Описание преимуществ вашего бизнеса.</p>-->
+        <a href="{{ url_for('_get_start_benchmark') }}" class="button">Запустить бенчмарк</a>
+    </section>
+
+{% endblock %}

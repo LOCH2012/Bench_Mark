@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Отчеты тестирований{% endblock %}
+
+{% block h1 %}Отчеты тестирований{% endblock %}
+
+{% block content %}
+<section class="card">
+    <ul class="list-elements">
+        {% for name in reports|sort %}
+        <li class="list-item">
+            <a href="{{ url_for('_get_report_summary', report_name=name) }}" class="list-link">
+                <span class="list-title">{{ name }}</span>
+                <!--                <span class="execution-status status-{{ "status"|lower }}">{{ "status" }}</span>-->
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+    <!--    {% for name in profiles|sort %}-->
+    <!--    <p><a href="{{ url_for('_get_benchmark_status', profile_name=name) }}"><b>{{ name }}</b></a></p>-->
+    <!--    {% endfor %}-->
+
+
+</section>
+
+{% endblock %}

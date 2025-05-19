@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Профили нагрузрок{% endblock %}
+
+{% block h1 %}Профили нагрузрок{% endblock %}
+
+{% block meta  %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/yaml/yaml.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<section class="card">
+    <div>
+        <form method="GET" action="{{ url_for('_get_profile_editor_create') }}">
+            <div class="select-group">
+                <div class="select-item">
+                    <label for="profile_name">Имя профиля:</label>
+                    <input type="text" id="profile_name" name="profile_name" required>
+                </div>
+                <div class="select-item">
+                    <button type="submit">Создать</button>
+                </div>
+        </form>
+    </div>
+
+    <ul class="list-elements">
+        {% for name in profiles|sort %}
+        <li class="list-item">
+            <a href="{{ url_for('_get_profile_editor', profile_name=name) }}" class="list-link">
+                <span class="list-title">{{ name }}</span>
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,5 @@
+_test/
+_results/
+.venv/
+.idea
+.vscode/

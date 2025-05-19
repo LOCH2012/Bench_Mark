@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Статус бенчмарка{% endblock %}
+
+{% block h1 %}Статус бенчмарка{% endblock %}
+
+{% block content %}
+<section class="card">
+    {% if exec_status %}
+    <h4>Статус: {{ exec_status.status }}</h4>
+    <h5>Фаза: {{ exec_status.phase }} из {% if summary.profile %}{{ summary.profile.phases|length }}{% endif %}</h5>
+    <h5>Профиль нагрузки: {{ summary.profile_name|default('') }}</h5>
+    <h5>Начало: {{ summary.start_time|default('') }}</h5>
+    {% if summary.finish_time %}<h5>Завершение: {{ summary.finish_time }}</h5>{% endif %} {% endif %}
+
+    <div style="display: flex; gap: 10px; align-items: center;">
+        {% if exec_status.status != "done" %}
+        <form method="POST" action="{{ url_for('_post_interrupt_benchmark') }}">
+            <!--        <label for="csv_file">Имя CSV файла:</label>-->
+            <input type="hidden" id="execution_id" name="execution_id" value="{{ execution_id }}" required>
+            <button type="submit">Прервать</button>
+        </form>
+        {% endif %}
+        <a class="button" href="{{ url_for('_get_report_summary', report_name=execution_id) }}">Результаты</a>
+    </div>
+
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Статус бенчмарков{% endblock %}
+
+{% block h1 %}Статус бенчмарков{% endblock %}
+
+{% block content %}
+<section class="card">
+    <ul class="list-elements">
+        {% for name, value in executions|sort %}
+        <li class="list-item">
+            <a href="{{ url_for('_get_benchmark_status', execution_id=name) }}" class="list-link">
+                <span class="list-title">{{ name }}</span>
+                <span class="list-status status-{{ value.status|lower }}">{{ value.status }}</span>
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+
+
+</section>
+
+{% endblock %}

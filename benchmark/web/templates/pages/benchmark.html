@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Запуск бенчмарка{% endblock %}
+
+{% block h1 %}Запуск бенчмарка{% endblock %}
+
+{% block content %}
+<section class="card">
+    <form method="POST" action="{{ url_for('_post_start_benchmark') }}">
+        <!--        <label for="csv_file">Имя CSV файла:</label>-->
+        <!--        <input type="text" id="csv_file" name="csv_file" placeholder="например, data/sample.csv" required>-->
+        <div class="select-group">
+            <div class="select-item">
+                <label for="profile_name">Профиль:</label>
+                <select id="profile_name" name="profile_name" required style="width: auto; min-width: 250px">
+                    {% for name in profiles %}
+                    <option value="{{ name }}">{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="select-item">
+                <button type="submit">Запуск</button>
+            </div>
+    </form>
+    </form>
+</section>
+
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block meta %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/yaml/yaml.min.js"></script>
+{% endblock %}
+
+{% block title %}Профиль нагрузок{% endblock %}
+
+{% block h1 %}Профиль нагрузок{% endblock %}
+
+{% block content %}
+<section class="card">
+    <h2>{{ profile_name }}</h2>
+
+    <form method="POST" action="{{ url_for('_post_profile_editor') }}">
+        <input type="hidden" id="profile_name" name="profile_name" value="{{profile_name}}">
+        <textarea id="yaml-editor" name="profile_text" class="yaml-editor">{{profile_text}}</textarea>
+        <button type="submit">Сохранить</button>
+    </form>
+
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        CodeMirror.fromTextArea(document.getElementById('yaml-editor'), {
+            mode: 'yaml'
+        });
+    });
+</script>
+
+{% endblock %}

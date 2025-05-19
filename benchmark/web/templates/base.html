@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Мой сайт{% endblock %}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    {% block meta %}{% endblock %}
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+<header>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('home') }}" {% if request.path== url_for('home') %}class="active"{% endif
+                %}>Главная</a></li>
+            <li><a href="{{ url_for('_get_profile_list') }}" {% if request.path== url_for('_get_profile_list')
+                %}class="active"{% endif %}>Профили нагрузрок</a></li>
+            <li><a href="{{ url_for('_get_start_benchmark') }}" {% if request.path== url_for('_get_start_benchmark')
+                %}class="active"{% endif %}>Запустить бенчмарк</a></li>
+            <li><a href="{{ url_for('_get_benchmark_list') }}" {% if request.path== url_for('_get_benchmark_list')
+                %}class="active"{% endif %}>Статус бенчмарков</a></li>
+            <li><a href="{{ url_for('_get_report_list') }}" {% if request.path== url_for('_get_report_list')
+                %}class="active"{% endif %}>Отчеты</a></li>
+        </ul>
+    </nav>
+
+    {% block header_content %}
+    <h1>{% block h1 %}Добро пожаловать{% endblock %}</h1>
+    <p>{% block subtitle %}{% endblock %}</p>
+    {% endblock %}
+</header>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="flashes">
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<main class="container">
+    {% block content %}{% endblock %}
+</main>
+
+{% include 'includes/footer.html' %}
+{% include 'includes/scripts.html' %}
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>
