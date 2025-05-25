@@ -1,11 +1,7 @@
-import time
 from multiprocessing import RLock
-from typing import Callable
 
 from benchmark.metrics.metric_reporter import MetricReporter
 from benchmark.model.execution import ExecutionRequest
-from benchmark.model.profile import BenchmarkProfile
-from benchmark.workload.file_handler import FileHandler, FSFileHandler
 from benchmark.workload.phase_runner import PhaseRunner
 
 
@@ -38,7 +34,7 @@ class ProfileRunner:
         for i, phase in enumerate(self._request.profile.phases):
             self._phase_callback.set(i + 1)
             # time.sleep(1)
-            runner = PhaseRunner(phase, self._metric_reporter, self._request.storage_configuration)
+            runner = PhaseRunner(i + 1, phase, self._metric_reporter, self._request.storage_configuration)
             runner.run()
 
         self._metric_reporter.summarize()

@@ -7,7 +7,7 @@ from benchmark.config import BLOCK_SIZE, METRICS_PATH
 def df_by_operation(execution_id, group_by: str | None, aggregation):
     df = pd.read_csv(METRICS_PATH / f"{execution_id}_ops.csv")
     df["time"] = pd.to_datetime(df["time"], errors="coerce")
-    df["latency_ms"] = df["duration"] * 1000
+    df["latency_ns"] = df["duration"] * 1000 * 1000
 
     if group_by == "time":
         df["x"] = (df["time"].dt.floor(f"{aggregation}s")).astype(str)
@@ -20,7 +20,7 @@ def df_by_operation(execution_id, group_by: str | None, aggregation):
 def df_by_units(execution_id, group_by, aggregation):
     df = pd.read_csv(METRICS_PATH / f"{execution_id}_units.csv")
     df["time"] = pd.to_datetime(df["time"], errors="coerce")
-    df["latency_ms"] = df["duration"] * 1000
+    df["latency_ns"] = df["duration"] * 1000 * 1000
 
     if group_by == "time":
         df["x"] = (df["time"].dt.floor(f"{aggregation}s")).astype(str)
@@ -88,7 +88,7 @@ def fields_by_metric(metric):
     elif metric == "errors":
         return ["is_failed"]
     elif metric.startswith("latency"):
-        return ["latency_ms"]
+        return ["latency_ns"]
 
 
 def group_metric(group, metric):
@@ -103,12 +103,12 @@ def group_metric(group, metric):
         group["x"] = group["is_failed"]
     elif metric.startswith("latency"):
         if metric == "latency_max":
-            group = group.agg(latency_ms=("latency_ms", "max")).reset_index()
+            group = group.agg(latency_ns=("latency_ns", "max")).reset_index()
         elif metric == "latency_p99":
-            group = group.agg(latency_ms=("latency_ms", lambda x: np.percentile(x, 99))).reset_index()
+            group = group.agg(latency_ns=("latency_ns", lambda x: np.percentile(x, 99))).reset_index()
         elif metric == "latency_p95":
-            group = group.agg(latency_ms=("latency_ms", lambda x: np.percentile(x, 95))).reset_index()
+            group = group.agg(latency_ns=("latency_ns", lambda x: np.percentile(x, 95))).reset_index()
         else:
             group = group.mean().reset_index()
-        group["x"] = group["latency_ms"]
+        group["x"] = group["latency_ns"]
     return group

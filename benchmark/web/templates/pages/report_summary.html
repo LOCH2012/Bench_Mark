@@ -11,51 +11,109 @@
 {% block content %}
 <section class="card">
     <h2>{{ report_name }}</h2>
-    <h5>Профиль нагрузки: {{ summary.profile_name }}, фаз тестирования {{ summary.profile.phases|length}}</h5>
-    <h5>Начало: {{ summary.start_time }}</h5>
-    {% if summary.finish_time %}<h5>Завершение: {{ summary.finish_time }}</h5>{% endif %}
+    <div class="metric-item">
+        <span class="metric-label">Профиль:</span> <span class="metric-value">{{ summary.profile_name }}, фаз тестирования {{ summary.profile.phases|length}}</span>
+    </div>
+    <div class="metric-item"><span class="metric-label">Начало:</span> <span class="metric-value">{{ summary.start_time }}</span>
+    </div>
+    {% if summary.finish_time %}
+    <div class="metric-item"><span class="metric-label">Завершение:</span> <span class="metric-value">{{ summary.finish_time }}</span>
+    </div>
+    {% endif %}
 
-    {% set criteria = [
-    ('phase_id', 'Phase'),
-    ('operation_type', 'Operation type'),
-    ('operation_id', 'Operation id'),
-    ] %}
-    <div class="select-group">
-        <div class="select-item">
-            <label for="metric">Метрика:</label>
-            <select id="metric">
-                {% for value, label in [
-                ('mbps', 'Throughput MB/sec'),
-                ('iops', 'Throughput IOPS'),
-                ('latency', 'Latency ms'),
-                ('latency_max', 'Max latency ms'),
-                ('latency_p99', 'Latency ms p99'),
-                ('latency_p95', 'Latency ms p95'),
-                ('errors', 'Errors')
-                ] %}
-                <option value="{{ value }}">{{ label }}</option>
-                {% endfor %}
-            </select>
+    <div class="tabs">
+        <input type="radio" name="tabs" id="tab1" checked>
+        <label for="tab1">Общие результаты</label>
+        <div class="tab-content">
+            {% set criteria = [
+            ('phase_id', 'Phase'),
+            ('operation_type', 'Operation type'),
+            ('operation_id', 'Operation id'),
+            ] %}
+            <div class="select-group">
+                <div class="select-item">
+                    <label for="metric">Метрика:</label>
+                    <select id="metric">
+                        {% for value, label in [
+                        ('mbps', 'Throughput MB/sec'),
+                        ('iops', 'Throughput IOPS'),
+                        ('latency', 'Latency ns'),
+                        ('latency_max', 'Max latency ns'),
+                        ('latency_p99', 'Latency ns p99'),
+                        ('latency_p95', 'Latency ns p95'),
+                        ('errors', 'Errors')
+                        ] %}
+                        <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="select-item">
+                    <label for="group">Группировка:</label>
+                    <select id="group">
+                        {% for value, label in criteria %}
+                        <option value="{{ value }}" {% if value==
+                        'operation_type' %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="select-item">
+                    <label for="aggregation">Аггрегация:</label>
+                    <select id="aggregation">
+                        {% for value, label in criteria %}
+                        <option value="{{ value }}" {% if value=='phase_id' %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div id="plot" style="width: 95%; height: 600px;"></div>
         </div>
-        <div class="select-item">
-            <label for="group">Группировка:</label>
-            <select id="group">
-                {% for value, label in criteria %}
-                <option value="{{ value }}" {% if value == 'operation_type' %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-            </select>
+
+        <input type="radio" name="tabs" id="tab2">
+        <label for="tab2">Графики</label>
+        <div class="tab-content">
+            Барабулька
         </div>
-        <div class="select-item">
-            <label for="aggregation">Аггрегация:</label>
-            <select id="aggregation">
-                {% for value, label in criteria %}
-                <option value="{{ value }}" {% if value == 'phase_id' %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-            </select>
+
+        <input type="radio" name="tabs" id="tab3">
+        <label for="tab3">Информация о запуске</label>
+        <div class="tab-content">
+            <h4>Конфигурация хранилища</h4>
+            {% set storage = summary.storage_configuration|default({}) %}
+            {% if storage %}
+            {% if storage.path %}
+            <div class="metric-item"><span class="metric-label">Путь:</span> <span class="metric-value">{{ storage.path }}</span>
+            </div>
+            {% endif %}
+            {% if storage.device %}
+            <div class="metric-item"><span class="metric-label">Устройство:</span> <span class="metric-value">{{ storage.device }}</span>
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="metric-item">Нет информации о хранилище</div>
+            {% endif %}
+
+            <h3>Системная информация</h3>
+            {% set labels = {
+            "os_distro": "Дистрибутив",
+            "os_version": "Версия ядра",
+            "os_release": "Релиз ядра",
+            "cpu_cores": "Количество ядер",
+            "cpu_model": "Модель процессора",
+            "cpu_frequency_mhz": "Частота процессора (МГц)",
+            "memory_total_gb": "Объем памяти (ГБ)",
+            "hostname": "Имя хоста",
+            } %}
+            {% set system = summary.system_info|default({}) %}
+
+            {% for key, label in labels.items() %}
+            {% if system.get(key) is not none %}
+            <div class="metric-item"><span class="metric-label">{{ label }}:</span> <span class="metric-value">{{ system[key] }}</span>
+            </div>
+            {% endif %}
+            {% endfor %}
         </div>
     </div>
-
-    <div id="plot" style="width: 95%; height: 600px;"></div>
 </section>
 
 <script>

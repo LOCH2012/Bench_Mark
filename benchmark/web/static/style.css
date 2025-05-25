@@ -246,6 +246,80 @@ input, textarea, select {
     color: #e53e3e;
 }
 
+/* Tabs */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.tabs input[type="radio"] {
+  display: none;
+}
+
+.tabs > label {
+  padding: 10px 16px;
+  margin-right: 5px;
+  cursor: pointer;
+  background: #f1f1f1;
+  border-radius: 4px 4px 0 0;
+  transition: background 0.3s;
+}
+
+.tabs input[type="radio"]:checked + label {
+  background: #fff;
+  border-bottom: 2px solid #3182ce;
+}
+
+.tab-content {
+  display: none;
+  width: 100%;
+  padding: 15px;
+  background: #fff;
+  order: 1;
+}
+
+.tabs input[type="radio"]:checked + label + .tab-content {
+  display: block;
+}
+
+/* Metrics */
+.metrics-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 14px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.metric-item {
+  display: flex;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.metric-item:last-child {
+  border-bottom: none;
+}
+
+.metric-label {
+  font-weight: 600;
+  color: #2d3748;
+  min-width: 220px;
+  margin-right: 15px;
+}
+
+.metric-value {
+  color: #4a5568;
+  flex-grow: 1;
+  word-break: break-word;
+}
+
 /* Flushes */
 .flashes {
     position: fixed;

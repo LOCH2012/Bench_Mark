@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from mmap import mmap
 from pathlib import Path
 import os
 import time
@@ -16,16 +17,23 @@ from benchmark.config import BLOCK_SIZE
 
 class FileHandler(ABC):
     @abstractmethod
-    def create(self): pass
+    def create(self):
+        """Создает файл, если он не еще не был создан."""
+
+    @abstractmethod
+    def initialize(self):
+        """Заполняет файл случайными данными."""
 
     @abstractmethod
     def delete(self): pass
 
     @abstractmethod
-    def read_blocks(self, n=None, time_end=None, random_access=False): pass
+    def read_blocks(self, n=None, time_end=None, random_access=False):
+        """Читает n блоков из файла не более time_end секунд."""
 
     @abstractmethod
-    def write_blocks(self, n=None, time_end=None, random_access=False): pass
+    def write_blocks(self, n=None, time_end=None, random_access=False):
+        """Пишет n блоков в файл не более time_end секунд."""
 
     @abstractmethod
     def file_name(self): pass
@@ -64,7 +72,10 @@ class FSFileHandler(FileHandler):
         if self.created:
             return
         if not self.path.exists():
-            os.close(os.open(str(self.path), os.O_CREAT | os.O_WRONLY, 0o660))
+            # os.close(os.open(str(self.path), os.O_CREAT | os.O_WRONLY, 0o644))
+            # self.path.touch()
+            with open(str(self.path), 'wb') as f:
+                f.write(b'\0' * self.size)
         self.created = True
 
     def initialize(self):
@@ -99,9 +110,11 @@ class FSFileHandler(FileHandler):
         try:
             start_time = time.time()
             fd = os.open(str(self.path), os.O_RDWR | getattr(os, "O_DIRECT", 0))
+            if fd == 0:
+                print("zero fd", self.path)
             with os.fdopen(fd, access_mode, buffering=0) as f:
-
                 file_size = self.file_size()
+                block = self._random_block()
                 positions = list(range(0, file_size, self.block_size))
                 ops = 0
                 units = []
@@ -114,9 +127,9 @@ class FSFileHandler(FileHandler):
                         if mode == 'r':
                             os.read(fd, self.block_size)
                         elif mode == 'r+':
-                            os.write(fd, self._random_block())
+                            os.write(fd, block)
                     except (IOError, OSError) as e:
-                        print("io_operation_error", e)
+                        print("io_operation_error_2", e, self.path)
                         return units, True
                     now_time = time.time()
                     units.append((now_time - start_time, now_time - prev_time))
@@ -124,7 +137,7 @@ class FSFileHandler(FileHandler):
                     ops += 1
                 return units, False
         except (IOError, OSError) as e:
-            print("io_operation_error", e)
+            print("io_operation_error", e, self.path)
             raise FileHandlerException(str(e), self.filename)
 
     def read_blocks(self, n=None, time_end=None, random_access=False):
@@ -133,9 +146,14 @@ class FSFileHandler(FileHandler):
     def write_blocks(self, n=None, time_end=None, random_access=False):
         return self._do_io('r+', op_count=n, time_end=time_end, random_access=random_access)
 
+    def _aligned_buffer(self, size):
+        buf = mmap(-1, size + BLOCK_SIZE)
+        offset = 0
+        return buf[offset:offset + size]
+
     def _random_block(self):
         if self.binary:
-            return os.urandom(self.block_size)
+            return os.urandom(self.block_size) # self._aligned_buffer(self.block_size)  #
         return ''.join(random.choices('abcdefghijklmnopqrstuvwxyz', k=self.block_size))
 
     def file_name(self):
@@ -311,3 +329,9 @@ class SMBFileHandler(FileHandler):
                 self.connection.disconnect()
             except:
                 pass
+
+
+if __name__ == '__main__':
+    h = FSFileHandler(basepath="_test", size=1024 ** 2)
+    h.create()
+    h.write_blocks(n=10)

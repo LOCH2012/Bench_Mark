@@ -4,7 +4,10 @@ from pydantic import BaseModel
 
 from benchmark.model.profile import BenchmarkProfile
 
-StorageConfiguration: TypeAlias = str
+
+class StorageConfiguration(BaseModel):
+    path: str
+    device: str
 
 
 class ExecutionRequest(BaseModel):

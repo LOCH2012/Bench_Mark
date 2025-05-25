@@ -33,7 +33,6 @@ def _post_start_benchmark():
     profile = profiles.get(profile_name)
     exec_conf = ExecutionRequest(profile_name=profile_name, profile=profile, storage_configuration=STORAGE_CONFIG)
     try:
-        print("run", profile_name, profile)
         execution_id = BENCHMARK_EXECUTOR.execute(exec_conf, metricFileReporter)
         flash(f"Бенчмарк запущен", "success")
         return redirect(url_for("_get_benchmark_status", execution_id=execution_id))
@@ -75,12 +74,12 @@ def _get_profile_list():
 @app.route("/profiles/edit")
 def _get_profile_editor():
     profile_name = request.args.get('profile_name')
-    profile = profiles.get(profile_name)
+    profile = profiles.get_raw(profile_name)
     if not profile:
         flash(f"Profile {profile_name} not found", "error")
         return redirect(url_for('_get_profile_list'))
     return render_template("pages/profile_editor.html",
-                           profile_text=profile_to_yaml(profile), profile_name=profile_name)
+                           profile_text=profile, profile_name=profile_name)
 
 
 @app.route("/profiles/edit", methods=["POST"])

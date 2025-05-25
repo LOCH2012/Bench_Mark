@@ -19,6 +19,13 @@ class ProfileRepository:
         with open(path) as f:
             return yaml_to_profile(f)
 
+    def get_raw(self, profile_name: str) -> Optional[str]:
+        path = self._profiles_path / f"{profile_name}.yaml"
+        if not path.exists():
+            return None
+        with open(path) as f:
+            return f.read()
+
     def list(self) -> list[str]:
         return [i.name[:-5] for i in self._profiles_path.glob("*.yaml")]
 
